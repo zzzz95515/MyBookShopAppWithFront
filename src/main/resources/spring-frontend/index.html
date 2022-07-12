@@ -59,7 +59,7 @@
       <main class="Middle-main">
         <div class="Section">
           <div class="Section-header">
-            <h2 class="Section-title">Рекомендуемое
+            <h2 class="Section-title" th:text="#{topbar.recommended}">Рекомендуемое
             </h2>
           </div>
           <div class="Slider Slider_carousel">
@@ -98,30 +98,14 @@
               <div class="Slider-item" th:each="book : ${newBooks}">
                 <div th:replace="~{fragment/card_fragment :: cardFragment}"></div>
               </div>
-<!--              <div class="Slider-item">-->
-<!--                <div class="Slider-content">-->
-<!--                  <div class="Card"><a class="Card-picture" href="/books/slug.html"><img src="/assets/img/content/main/card.jpg" alt="card.jpg"/>-->
-<!--                      <div class="Card-sale">30% скидка-->
-<!--                      </div></a>-->
-<!--                    <div class="Card-content">-->
-<!--                      <strong class="Card-title"><a href="/books/slug.html">Техника</a>-->
-<!--                      </strong>-->
-<!--                      <div class="Card-description">Кондратенко Александр Петрович-->
-<!--                      </div>-->
-<!--                      <div class="Card-cost"><span class="Card-priceOld">₽500.00</span><span class="Card-price">₽390.00</span>-->
-<!--                      </div>-->
-<!--                    </div>-->
-<!--                  </div>-->
-<!--                </div>-->
-<!--              </div>-->
-
-
-              <div class="Slider-navigateWrap"></div>
-              <div class="Slider-navigate"></div>
+            </div>
+            <div class="Slider-navigateWrap">
+              <div class="Slider-navigate">
+              </div>
             </div>
             <div class="Slider-load">
-<!--              <div class="Slider-load-text">Идет загрузка данных-->
-<!--              </div>-->
+<!--                <div class="Slider-load-text">Идет загрузка данных-->
+              </div>
             </div>
           </div>
           <div class="Section-header">
@@ -139,8 +123,8 @@
               </div>
             </div>
             <div class="Slider-load">
-<!--              <div class="Slider-load-text">Идет загрузка данных-->
-<!--              </div>-->
+              <div class="Slider-load-text">Идет загрузка данных
+              </div>
             </div>
           </div>
         </div>

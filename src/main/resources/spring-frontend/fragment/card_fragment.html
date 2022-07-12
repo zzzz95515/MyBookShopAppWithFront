@@ -3,16 +3,26 @@
 <html lang="ru" xmlns:th="http://www.thymeleaf.org">
 <body>
 <div class="Card" th:fragment="cardFragment">
-    <div class="Card"><a class="Card-picture" href="/books/slug.html" th:href="${book.id}"><img src="/assets/img/content/main/card.jpg" alt="card.jpg"/></a>
-        <div class="Card-content">
-            <strong class="Card-title"><a href="/books/slug.html" th:text="${book.title}">Техника</a>
-            </strong>
-            <div class="Card-description" th:text="${book.authorName}">Кондратенко Валерий Петрович
-            </div>
-            <div class="Card-cost"><span class="Card-priceOld" th:text="${book.priceOld}">₽300.00</span><span class="Card-price" th:text="${book.price}">₽190.00</span>
-            </div>
-        </div>
+    <div class="Card-picture"> <a href="/books/slug.html" th:href="${book.id}">
+        <img src="/assets/img/content/main/card.jpg" alt="card.jpg"/></a>
+        <div class="Card-sale" th:if="${book.priceOld} > ${book.price}" th:text="скидка">30% скидка </div>
     </div>
+    <div class="Card-content">
+        <strong class="Card-title"><a href="/books/slug.html" th:text="${book.title}">Техника</a>
+        </strong>
+        <div class="Card-description" th:text="${book.authorName}">Кондратенко Валерий Петрович
+        </div>
+        <div class="Card-cost" th:if="${book.priceOld} > ${book.price}">
+            <span class="Card-priceOld" th:text="${book.priceOld}">₽300.00</span>
+            <span class="Card-price" th:text="${book.price}">₽190.00</span>
+        </div>
+        <div class="Card-cost" th:if="${book.priceOld} <= ${book.price}">
+            <span class="Card-price" th:text="${book.price}">₽190.00</span>
+        </div>
+<!--        <div class="Card-cost" th:if="${book.priceOld} == ${book.price}"><span class="Card-priceOld" th:text="${book.priceOld}">₽300.00</span>-->
+<!--        </div>-->
+    </div>
+
 </div>
 </body>
 </html>

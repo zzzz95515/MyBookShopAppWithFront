@@ -5,15 +5,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 public class OtherPageController {
-    @GetMapping("/books/recent")
-    public String newsPage(){
-        return "/books/recent";
-    }
 
-    @GetMapping("/books/popular")
-    public String popularPage(){
-        return "/books/popular";
-    }
+
+
 
     @GetMapping("/faq")
     public String faqPage(){

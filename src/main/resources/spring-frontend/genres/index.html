@@ -9,6 +9,7 @@
 <!--[if IE 9]>
 <html class="ie9" lang="ru">
 <![endif]-->
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
 <!--[if gt IE 9]><!--> <html lang="ru"> <!--<![endif]-->
 <head>
   <title>Тут название страницы написать</title>
@@ -54,7 +55,7 @@
   <div class="Middle">
     <div class="wrap">
       <main class="Middle-main">
-        <h1 class="Middle-title">Жанры
+        <h1 class="Middle-title" th:text="#{topbar.genres}">Жанры
         </h1>
         <div class="Section">
           <div class="Tags Tags_genres">

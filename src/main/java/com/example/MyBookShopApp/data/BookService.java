@@ -31,7 +31,7 @@ public class BookService {
             return book;
         });
         for (Book book: books){
-            List<Author> authors =  jdbcTemplate.query("Select * from authors where authors.id = " + String.valueOf(book.getAuthor()),(ResultSet rs, int rowNum) -> {
+            List<Author> authors =  jdbcTemplate.query("Select top 40 * from authors where authors.id = " + String.valueOf(book.getAuthor()),(ResultSet rs, int rowNum) -> {
                 Author author = new Author();
                 author.setLastName(rs.getString("last_name"));
                 author.setFirstName(rs.getString("first_name"));
