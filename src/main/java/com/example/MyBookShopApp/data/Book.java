@@ -1,37 +1,45 @@
 package com.example.MyBookShopApp.data;
 
+import javax.persistence.*;
+
+@Entity
+@Table(name = "books")
+
 public class Book {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    private Integer author;
 
-    private String authorName;
+    @Transient
+    private String author;
+//    private Integer author_id;
+
+//    private String authorName;
 
 
 
     private String title;
-    private String priceOld;
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
+    }
+
+    private String price_old;
     private String price;
 
-    @Override
-    public String toString() {
-        return "Book{" +
-                "id=" + id +
-                ", author=" + author +
-                ", authorLastName='" + authorName + '\'' +
-                ", title='" + title + '\'' +
-                ", priceOld='" + priceOld + '\'' +
-                ", price='" + price + '\'' +
-                '}';
-    }
-
-    public String getAuthorName() {
-        return authorName;
-    }
-
-    public void setAuthorName(String authorName) {
-        this.authorName = authorName;
-    }
+//
+//    public String getAuthorName() {
+//        return authorName;
+//    }
+//
+//    public void setAuthorName(String authorName) {
+//        this.authorName = authorName;
+//    }
 
 
     public Integer getId() {
@@ -42,13 +50,13 @@ public class Book {
         this.id = id;
     }
 
-    public Integer getAuthor() {
-        return author;
-    }
+//    public Integer getAuthor_id() {
+//        return author_id;
+//    }
 
-    public void setAuthor(Integer author) {
-        this.author = author;
-    }
+//    public void setAuthor_id(Integer author_id) {
+//        this.author_id = author_id;
+//    }
 
     public String getTitle() {
         return title;
@@ -58,12 +66,12 @@ public class Book {
         this.title = title;
     }
 
-    public String getPriceOld() {
-        return priceOld;
+    public String getPrice_old() {
+        return price_old;
     }
 
-    public void setPriceOld(String priceOld) {
-        this.priceOld = priceOld;
+    public void setPrice_old(String priceOld) {
+        this.price_old = priceOld;
     }
 
     public String getPrice() {
