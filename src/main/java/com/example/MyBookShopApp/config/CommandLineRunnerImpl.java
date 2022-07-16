@@ -1,16 +1,9 @@
 package com.example.MyBookShopApp.config;
 
-import com.example.MyBookShopApp.data.*;
-import org.hibernate.HibernateError;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
-
-import javax.persistence.EntityManagerFactory;
-import java.util.List;
-import java.util.logging.Logger;
+import com.example.MyBookShopApp.data.BookRepository;
 
 @Configuration
 public class CommandLineRunnerImpl implements CommandLineRunner {
@@ -43,8 +36,8 @@ public class CommandLineRunnerImpl implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
 
-        Logger.getLogger(CommandLineRunnerImpl.class.getSimpleName()).info(bookRepository.findBooksByAuthor_FirstName("Aleen").toString());
-        Logger.getLogger(CommandLineRunnerImpl.class.getSimpleName()).info(bookRepository.customFindAllBooks().toString());
+//        Logger.getLogger(CommandLineRunnerImpl.class.getSimpleName()).info(bookRepository.findBooksByAuthor_FirstName("Aleen").toString());
+//        Logger.getLogger(CommandLineRunnerImpl.class.getSimpleName()).info(bookRepository.customFindAllBooks().toString());
 //        for (int i=0;i<5;i++){
 //            createTestEntity(new TestEntity());
 //        }
