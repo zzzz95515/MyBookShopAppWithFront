@@ -13,11 +13,10 @@ public class Author {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    private String first_name;
-    private String last_name;
+    private String firstName;
+    private String lastName;
 
     @OneToMany
-    @JoinColumn(name = "author_id", referencedColumnName = "id")
     private List<Book> bookList = new ArrayList<>();
 
     public List<Book> getBookList() {
@@ -30,7 +29,7 @@ public class Author {
 
     @Override
     public String toString() {
-        return last_name +" "+ first_name;
+        return lastName +" "+ firstName;
     }
 
     public Integer getId() {
@@ -41,19 +40,19 @@ public class Author {
         this.id = id;
     }
 
-    public String getFirst_name() {
-        return first_name;
+    public String getFirstName() {
+        return firstName;
     }
 
-    public void setFirst_name(String firstName) {
-        this.first_name = firstName;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
     }
 
-    public String getLast_name() {
-        return last_name;
+    public String getLastName() {
+        return lastName;
     }
 
-    public void setLast_name(String lastName) {
-        this.last_name = lastName;
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 }
