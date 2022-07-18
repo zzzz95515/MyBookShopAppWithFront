@@ -1,5 +1,7 @@
 package com.example.MyBookShopApp.data;
 
+import com.sun.istack.NotNull;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,8 +15,42 @@ public class Author {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
+    @NotNull
     private String firstName;
+    @NotNull
     private String lastName;
+
+    private String photo;
+
+    private String description;
+
+    @NotNull
+    private String slug;
+
+    public String getPhoto() {
+        return photo;
+    }
+
+    public void setPhoto(String photo) {
+        this.photo = photo;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getSlug() {
+        return slug;
+    }
+
+    public void setSlug(String slug) {
+        this.slug = slug;
+    }
 
     @OneToMany
     private List<Book> bookList = new ArrayList<>();
