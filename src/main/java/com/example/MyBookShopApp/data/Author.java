@@ -16,16 +16,16 @@ public class Author {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @NotNull
+//    @NotNull
     private String firstName;
-    @NotNull
+//    @NotNull
     private String lastName;
 
     private String photo;
 
     private String description;
 
-    @NotNull
+//    @NotNull
     private String slug;
 
     public String getPhoto() {
