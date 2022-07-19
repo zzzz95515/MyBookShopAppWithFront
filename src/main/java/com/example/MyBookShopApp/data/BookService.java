@@ -20,12 +20,32 @@ public class BookService {
     }
 
     public List<Book> getPopularBookData(){
-        return getBooksData();
+
+        return repository.getBestsellers();
     }
 
     public List<Book> getNewBookData(){
         return getBooksData();
     }
 
+    public List<Book> getBooksByAuthor(String authorName){
+        return repository.findBooksByAuthor_FirstNameContaining(authorName);
+    }
+
+    public List<Book> getBooksByTitle(String title){
+        return repository.findBooksByTitleContaining(title);
+    }
+
+    public List<Book> getBooksWithPriceBetween(Double min, Double max){
+        return repository.findBooksByPriceOldBetween(min,max);
+    }
+
+    public List<Book> getBooksWithPrice(Double price){
+        return repository.findBooksByPriceOldIs(price);
+    }
+
+    public List<Book> getBooksWithMaxDiscount(){
+        return repository.getBookWithMaxDiscount();
+    }
 
 }

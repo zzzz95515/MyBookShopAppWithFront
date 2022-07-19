@@ -7,7 +7,16 @@ import java.util.List;
 
 public interface BookRepository extends JpaRepository<Book,Integer> {
     List<Book> findBooksByAuthor_FirstName(String name);
-    @Query("from Book")
-    List<Book> customFindAllBooks();
+    List<Book> findBooksByAuthor_FirstNameContaining(String authorFirstName);
+    List<Book> findBooksByTitleContaining(String title);
 
+    List<Book> findBooksByPriceOldBetween(Double min, Double max);
+
+    List<Book> findBooksByPriceOldIs(Double price);
+
+    @Query("from Book where isBestseller=1")
+    List<Book> getBestsellers();
+
+    @Query(value = "SELECT * FROM books WHERE discount = (SELECT MAX(discount) FROM books)",nativeQuery = true)
+    List<Book> getBookWithMaxDiscount();
 }
