@@ -904,7 +904,7 @@ insert into authors (id, first_name, last_name) values (903, 'Brigida', 'Winkwor
 insert into authors (id, first_name, last_name) values (904, 'Ainslie', 'Blanchard');
 insert into authors (id, first_name, last_name) values (905, 'Justinn', 'Portis');
 insert into authors (id, first_name, last_name) values (906, 'Edmon', 'Ashlin');
-insert into authors (id, first_name, last_name) values (907, 'Anthe', 'Knevet');
+insert into authors (id, first_name, last_name) values (907, 'Anthe', 'deKnevet');
 insert into authors (id, first_name, last_name) values (908, 'Raff', 'Ashtonhurst');
 insert into authors (id, first_name, last_name) values (909, 'Trstram', 'Bartels-Ellis');
 insert into authors (id, first_name, last_name) values (910, 'Burch', 'De Nisco');
