@@ -5,7 +5,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
 import com.example.MyBookShopApp.data.BookRepository;
 
-@Configuration
+//@Configuration
 public class CommandLineRunnerImpl implements CommandLineRunner {
 
 //    EntityManagerFactory entityManagerFactory;

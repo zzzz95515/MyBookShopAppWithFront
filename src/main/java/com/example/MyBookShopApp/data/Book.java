@@ -31,7 +31,7 @@ public class Book {
         this.author = author;
     }
 
-    @Transient
+//    @Transient
     private String price_old;
 
 //    @NotNull
