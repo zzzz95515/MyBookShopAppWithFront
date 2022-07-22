@@ -2,12 +2,12 @@ package com.example.MyBookShopApp.data;
 
 import java.util.List;
 
-public class RecommendedBooksPageDto {
+public class BooksPageDto {
 
     private Integer count;
     public List<Book> books;
 
-    public RecommendedBooksPageDto(List<Book> books) {
+    public BooksPageDto(List<Book> books) {
         this.books = books;
         this.count=books.size();
     }

@@ -3,14 +3,14 @@ package com.example.MyBookShopApp.controllers;
 
 import com.example.MyBookShopApp.data.Book;
 import com.example.MyBookShopApp.data.BookService;
-import com.example.MyBookShopApp.data.RecommendedBooksPageDto;
-import io.swagger.annotations.Api;
+import com.example.MyBookShopApp.data.BooksPageDto;
+import com.example.MyBookShopApp.data.SearchWordDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -42,8 +42,26 @@ public class MainPageController {
     }
 
     @GetMapping("/books/recommended")
-    public RecommendedBooksPageDto getBooksPage(@RequestParam("offset") Integer offset, @RequestParam("limit") Integer limit){
+    public BooksPageDto getBooksPage(@RequestParam("offset") Integer offset, @RequestParam("limit") Integer limit){
 
-        return new RecommendedBooksPageDto( bookService.getPageOfRecommendedBooks(offset, limit).getContent());
+        return new BooksPageDto( bookService.getPageOfRecommendedBooks(offset, limit).getContent());
+    }
+
+    @ModelAttribute("searchWordDto")
+    public SearchWordDto searchWordDto(){
+        return new SearchWordDto();
+    }
+
+    @ModelAttribute("searchResults")
+    public List<Book> searchResults(){
+        return new ArrayList<>();
+    }
+
+
+    @GetMapping(value = {"/search","search/{searchWord}"})
+    public String getSearchResults(@PathVariable(value = "searchWord", required = false) SearchWordDto searchWordDto, Model model){
+        model.addAttribute("searchWordDto", searchWordDto);
+        model.addAttribute("searchResults", bookService.getPageOfSearchResultBooks(searchWordDto.getExample(),0,20).getContent());
+        return "/search/index";
     }
 }
