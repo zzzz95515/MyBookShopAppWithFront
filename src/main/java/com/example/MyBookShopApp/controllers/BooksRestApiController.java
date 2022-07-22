@@ -2,15 +2,14 @@ package com.example.MyBookShopApp.controllers;
 
 import com.example.MyBookShopApp.data.Book;
 import com.example.MyBookShopApp.data.BookService;
+import com.example.MyBookShopApp.data.SearchWordDto;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import liquibase.pro.packaged.B;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -61,6 +60,15 @@ public class BooksRestApiController {
     }
 
 
+    @ModelAttribute("searchWordDto")
+    public SearchWordDto searchWordDto(){
+        return new SearchWordDto();
+    }
+
+    @ModelAttribute("searchResults")
+    public List<Book> searchResults(){
+        return new ArrayList<>();
+    }
 
 }
 
