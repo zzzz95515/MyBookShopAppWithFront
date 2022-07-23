@@ -53,11 +53,11 @@ public class BooksRestApiController {
         return ResponseEntity.ok(service.getBooksWithMaxDiscount());
     }
 
-    @GetMapping("books/bestsellers")
-    @ApiOperation("operation to get bestsellers of bookshop")
-    public ResponseEntity<List<Book>> bestsellers(){
-        return ResponseEntity.ok(service.getPopularBookData());
-    }
+//    @GetMapping("books/bestsellers")
+//    @ApiOperation("operation to get bestsellers of bookshop")
+//    public ResponseEntity<List<Book>> bestsellers(){
+//        return ResponseEntity.ok(service.getPopularBookData());
+//    }
 
 
     @ModelAttribute("searchWordDto")

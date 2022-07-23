@@ -6,6 +6,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -59,5 +60,18 @@ public class BookService {
     public Page<Book> getPageOfSearchResultBooks(String searchWord, Integer offset, Integer limit){
         Pageable nextPage = PageRequest.of(offset,limit);
         return repository.findBookByTitleContaining(searchWord,nextPage);
+    }
+
+
+    public List<Book> getPageOfPopularBooks(Integer offset,Integer limit){
+        Pageable nextPage = PageRequest.of(offset,limit);
+        return repository.findBookByIsBestsellerEquals(1,nextPage).getContent();
+    }
+
+    public List<Book> getPageOfNewBooks(Integer offset,Integer limit){
+        Date date= new Date("2019/09/29");
+        Pageable nextPage = PageRequest.of(offset,limit);
+        List<Book> bookList= repository.findBookByPubDateAfter(date,nextPage).getContent();
+        return bookList;
     }
 }
