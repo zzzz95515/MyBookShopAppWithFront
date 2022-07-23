@@ -74,4 +74,14 @@ public class BookService {
         List<Book> bookList= repository.findBookByPubDateAfter(date,nextPage).getContent();
         return bookList;
     }
+
+    public List<Book> getPageOfRecentBooksByDates(String date1, String date2, Integer offset, Integer limit){
+        date1 = date1.replace('.','/');
+        date2 = date2.replace('.','/');
+        Date firstDate=new Date(date1);
+        Date secondDate=new Date(date2);
+        Pageable nextPage = PageRequest.of(offset,limit);
+        List<Book> resultlist=repository.findBookByPubDateBetweenOrderByPubDate(firstDate,secondDate,nextPage).getContent();
+        return  resultlist;
+    }
 }
