@@ -84,4 +84,9 @@ public class BookService {
         List<Book> resultlist=repository.findBookByPubDateBetweenOrderByPubDate(firstDate,secondDate,nextPage).getContent();
         return  resultlist;
     }
+
+    public List<Book> getPageOfPopularBooksOrderBy(Integer offset, Integer limit){
+        Pageable nextPage=PageRequest.of(offset,limit);
+        return repository.findBookByIsBestsellerGreaterThanOrderByIsBestseller(0,nextPage).getContent();
+    }
 }

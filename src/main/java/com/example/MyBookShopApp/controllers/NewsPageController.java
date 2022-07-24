@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 @Controller
 public class NewsPageController {
@@ -42,75 +43,6 @@ public class NewsPageController {
         return "/books/recent";
     }
 
-//    private Integer pageNum=10;
-
-//    @GetMapping("/books/recent")
-//    public BooksPageDto recentsPage(@RequestParam(required = false, value = "date1") String date1,
-//                                               @RequestParam(required = false, value = "date2") String date2,
-//                                               @RequestParam(value = "offset", required = false) Integer offset,
-//                                               @RequestParam(value = "limit", required = false) Integer limit,
-//                                               @PageableDefault(sort = {"pub_date"}, direction = Sort.Direction.DESC) Pageable pageable,
-//                                               Model model) throws ParseException {
-//
-//        if (date1==null){
-//            date1="01.01.1900";
-//        }
-//        if (date2==null){
-//            date2="30.12.2999";
-//        }
-//        if (offset==null){
-//            offset=0;
-//        }
-//        if (limit==null){
-//            limit=20;
-//        }
-//
-////        return "/books/recent";
-//        return new BooksPageDto((List<Book>) model.getAttribute("newBooks"));
-//    }
-
-//    @ModelAttribute("recentBookList")
-//    public List<Book> recentBookListByDates(){
-//        return bookService.getPageOfRecentBooksByDates(0,20);
-//
-//    }
-
-//    @ModelAttribute("pubDatesDto")
-//    public PubDatesDto pubDatesDto(){
-//        return new PubDatesDto();
-//    }
-
-//    @ModelAttribute("resultList")
-//    public List<Book> resultList(){
-//        return new ArrayList<>();
-//    }
-
-//    @ModelAttribute("newBooks")
-//    @ResponseBody
-//    public List<Book> recentBooks(@RequestParam(required = false) List<Book> changedDateBooks,
-//                                  @RequestParam(value = "limit", required = false) Integer limit,
-//                                  @RequestParam(value = "offset", required = false) Integer offset,
-//                                  @RequestParam(required = false, value = "date1") String date1,
-//                                  @RequestParam(required = false, value = "date2") String date2,
-//                                  Model model){
-//        if (date1==null){
-//            date1="01.01.1900";
-//        }
-//        if (date2==null){
-//            date2="30.12.2999";
-//        }
-//        if (limit==null){
-//            limit=20;
-//        }
-//        if (offset==null){
-//            offset=0;
-//        }else if (offset!=0){
-//            limit+=10;
-//        }
-//        List<Book> resultList = bookService.getPageOfRecentBooksByDates(date1,date2,offset,limit);
-//        model.addAttribute("newBooks",resultList);
-//        return resultList;
-//    }
 
     @ModelAttribute("newBooks")
     public String recentBooksSearch(@RequestParam(required = false) List<Book> changedDateBooks,
@@ -130,8 +62,6 @@ public class NewsPageController {
         }
         if (offset==null){
             offset=0;
-        }else if (offset!=0){
-            limit+=10;
         }
         List<Book> resultList = bookService.getPageOfRecentBooksByDates(date1,date2,offset,limit);
         model.addAttribute("newBooks",resultList);
@@ -157,10 +87,9 @@ public class NewsPageController {
         }
         if (offset==null){
             offset=0;
-        }else if (offset!=0){
-            limit+=10;
         }
         BooksPageDto resultList = new BooksPageDto(bookService.getPageOfRecentBooksByDates(date1,date2,offset,limit));
+        Logger.getLogger(NewsPageController.class.getName()).info("вывод");
         return resultList;
     }
 
