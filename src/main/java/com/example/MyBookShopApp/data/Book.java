@@ -72,7 +72,33 @@ public class Book {
     @ApiModelProperty("book description text")
     private String description;
 
+    @ManyToOne
+    @JsonIgnore
+    @JoinColumn(name = "tag_id", referencedColumnName = "id")
+    private Tag tag;
 
+    @ManyToOne
+    @JsonIgnore
+    @JoinColumn(name = "genre_id", referencedColumnName = "id")
+    private Genre genre;
+
+    public Genre getGenre() {
+        return genre;
+    }
+
+    public void setGenre(Genre genre) {
+        this.genre = genre;
+    }
+
+    public Tag getTag() {
+        return tag;
+    }
+
+
+
+    public void setTag(Tag tag) {
+        this.tag = tag;
+    }
 
     public Integer getId() {
         return id;
@@ -156,6 +182,8 @@ public class Book {
         return "Book{" +
                 "id=" + id +
                 ", author=" + author +
+                ", tag=" + tag +
+                ", genre=" + genre +
                 ", title='" + title + '\'' +
                 ", priceOld='" + priceOld + '\'' +
                 ", price='" + price + '\'' +
