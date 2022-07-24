@@ -3,11 +3,14 @@ package com.example.MyBookShopApp.controllers;
 
 import com.example.MyBookShopApp.data.Book;
 import com.example.MyBookShopApp.data.BookService;
+import com.example.MyBookShopApp.data.BooksPageDto;
+import com.example.MyBookShopApp.data.SearchWordDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -20,41 +23,68 @@ public class MainPageController {
 
     @ModelAttribute("recomendedBooks")
     public List<Book> recomendedBooks(){
-        return bookService.getBooksData();
+        return bookService.getPageOfRecommendedBooks(0,6).getContent();
     }
     @ModelAttribute("newBooks")
     public List<Book> newBooks(){
-        return bookService.getNewBookData();
+        return bookService.getPageOfNewBooks(0,6);
     }
 
     @ModelAttribute("popularBooks")
     public List<Book> popularBooks(){
-        return bookService.getPopularBookData();
+        return bookService.getPageOfPopularBooks(0,6);
     }
 
     private final BookService bookService;
     @GetMapping("/")
     public String mainPage(){
-//        model.addAttribute("bookData", bookService.getBooksData());
-//        model.addAttribute("searchPlaceholder", "new search placeholder");
-//        model.addAttribute("serverTime", new SimpleDateFormat("hh:mm:ss").format(new Date()));
-//        model.addAttribute("placeholderTextPart2","SERVER");
-//        model.addAttribute("messageTemplate","searchbar.placeholder2");
         return "index";
     }
 
-//    @GetMapping("/genres")
-//    public String genresPage(){
-//        return "genres/index";
-//    }
+    @GetMapping("/books/recommended")
+    @ResponseBody
+    public BooksPageDto getBooksPage(@RequestParam("offset") Integer offset, @RequestParam("limit") Integer limit){
 
-//    @GetMapping("/books/authors")
-//    public String authorsPage(Model model){
-//        model.addAttribute("author", bookService.getAuthors());
-//        return "authors/index";
-//    }
-//    @GetMapping("/books/popular.html")
-//    public String popularPage(){
-//        return "books/popular";
-//    }
+        return new BooksPageDto( bookService.getPageOfRecommendedBooks(offset, limit).getContent());
+    }
+
+    @ModelAttribute("searchWordDto")
+    public SearchWordDto searchWordDto(){
+        return new SearchWordDto();
+    }
+
+    @ModelAttribute("searchResults")
+    public List<Book> searchResults(){
+        return new ArrayList<>();
+    }
+
+
+    @GetMapping(value = {"/search","search/{searchWord}"})
+    public String getSearchResults(@PathVariable(value = "searchWord", required = false) SearchWordDto searchWordDto, Model model){
+        model.addAttribute("searchWordDto", searchWordDto);
+        model.addAttribute("searchResults", bookService.getPageOfSearchResultBooks(searchWordDto.getExample(),0,5).getContent());
+        return "/search/index";
+    }
+
+    @GetMapping("search/page/{searchWord}")
+    @ResponseBody
+    public BooksPageDto getNextSearchPage(@RequestParam("offset") Integer offset, @RequestParam("limit") Integer limit,
+                                          @PathVariable(value = "searchWord", required = false) SearchWordDto searchWordDto){
+        return new BooksPageDto(bookService.getPageOfSearchResultBooks(searchWordDto.getExample(),offset,limit).getContent());
+    }
+
+    @GetMapping("/books/popular1")
+    @ResponseBody
+    public BooksPageDto getPopularBooksPage(@RequestParam("offset") Integer offset, @RequestParam("limit") Integer limit){
+
+        return new BooksPageDto( bookService.getPageOfPopularBooks(offset, limit));
+    }
+
+    @GetMapping("/books/recent1")
+    @ResponseBody
+    public BooksPageDto getNewBooksPage(@RequestParam("offset") Integer offset, @RequestParam("limit") Integer limit){
+
+        return new BooksPageDto( bookService.getPageOfNewBooks(offset, limit));
+    }
+
 }
