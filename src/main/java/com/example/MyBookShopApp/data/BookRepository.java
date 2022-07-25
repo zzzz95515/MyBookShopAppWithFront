@@ -31,4 +31,8 @@ public interface BookRepository extends JpaRepository<Book,Integer> {
 
     Page<Book> findBookByPubDateBetweenOrderByPubDate(Date date1, Date date2, Pageable nextPage);
     Page<Book> findBookByIsBestsellerGreaterThanOrderByIsBestseller(Integer pop, Pageable nextPage);
+
+    Page<Book> findBookByTag_Tag(String tag, Pageable nextPage);
+
+    Page<Book> findBookByGenre_Genre(String ganre, Pageable nextPage);
 }
