@@ -26,4 +26,8 @@ public class AuthorsService {
         }));
 
     }
+
+    public Author getAuthorById(Integer id){
+        return repository.findAuthorById(id).get(0);
+    }
 }

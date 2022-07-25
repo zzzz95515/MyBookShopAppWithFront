@@ -89,4 +89,19 @@ public class BookService {
         Pageable nextPage=PageRequest.of(offset,limit);
         return repository.findBookByIsBestsellerGreaterThanOrderByIsBestseller(0,nextPage).getContent();
     }
+
+    public List<Book> getPageOfBooksByTag(String tag, Integer offset, Integer limit){
+        Pageable nextPage=PageRequest.of(offset,limit);
+        return repository.findBookByTag_Tag(tag,nextPage).getContent();
+    }
+
+    public List<Book> getPageOfBooksByGenre(String genre, Integer offset, Integer limit){
+        Pageable nextPage=PageRequest.of(offset,limit);
+        return repository.findBookByGenre_Genre(genre,nextPage).getContent();
+    }
+
+    public List<Book>getPageOfAuthorsBooks(Integer author_id, Integer offset, Integer limit){
+        Pageable nextPage=PageRequest.of(offset,limit);
+        return repository.findBookByAuthor_Id(author_id,nextPage).getContent();
+    }
 }
