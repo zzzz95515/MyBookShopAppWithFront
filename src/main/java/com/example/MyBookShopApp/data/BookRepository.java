@@ -37,4 +37,6 @@ public interface BookRepository extends JpaRepository<Book,Integer> {
     Page<Book> findBookByGenre_Genre(String ganre, Pageable nextPage);
 
     Page<Book> findBookByAuthor_Id(Integer author_id, Pageable nextPage);
+
+    Book findBookBySlug(String slug);
 }
