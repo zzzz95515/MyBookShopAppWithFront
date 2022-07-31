@@ -1,5 +1,6 @@
 package com.example.MyBookShopApp.data;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sun.istack.NotNull;
@@ -25,6 +26,18 @@ public class Book {
     @JoinColumn(name = "author_id", referencedColumnName = "id")
     private Author author;
 
+    public Integer discountPrice(){
+        return Math.toIntExact(Math.round(priceOld-(0.01*price*priceOld)));
+    }
+
+    public Integer intDiscount(){
+        return Math.toIntExact(Math.round(price));
+    }
+
+    @JsonGetter("authors")
+    public String authorsFullName(){
+        return author.toString();
+    }
 
 
 @NotNull
