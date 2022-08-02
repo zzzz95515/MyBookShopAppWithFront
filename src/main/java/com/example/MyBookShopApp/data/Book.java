@@ -9,7 +9,9 @@ import io.swagger.annotations.ApiModelProperty;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "books")
@@ -77,6 +79,33 @@ public class Book {
 //    @NotNull
 @ApiModelProperty("mnemonical id sequence of characters")
     private String slug;
+
+    @OneToMany(mappedBy = "book")
+    private List<BookFile> bookFileList= new ArrayList<>();
+
+    public Date getPubDate() {
+        return pubDate;
+    }
+
+    public void setPubDate(Date pubDate) {
+        this.pubDate = pubDate;
+    }
+
+    public Integer getIsBestseller() {
+        return isBestseller;
+    }
+
+    public void setIsBestseller(Integer isBestseller) {
+        this.isBestseller = isBestseller;
+    }
+
+    public List<BookFile> getBookFileList() {
+        return bookFileList;
+    }
+
+    public void setBookFileList(List<BookFile> bookFileList) {
+        this.bookFileList = bookFileList;
+    }
 
     @ApiModelProperty("image url")
     private String image;

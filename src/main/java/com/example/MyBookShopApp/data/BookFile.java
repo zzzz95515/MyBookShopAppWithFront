@@ -1,7 +1,5 @@
 package com.example.MyBookShopApp.data;
 
-import com.sun.istack.NotNull;
-
 import javax.persistence.*;
 
 @Entity
@@ -15,9 +13,15 @@ public class BookFile {
 //    @NotNull
     private String hash;
 //    @NotNull
-    private Integer type_id;
+    @Column(name = "type_id")
+    private Integer typeId;
 //    @NotNull
+
     private String path;
+
+    @ManyToOne
+    @JoinColumn(name = "book_id", referencedColumnName = "id")
+    private Book book;
 
     public Integer getId() {
         return id;
@@ -35,12 +39,12 @@ public class BookFile {
         this.hash = hash;
     }
 
-    public Integer getType_id() {
-        return type_id;
+    public Integer getTypeId() {
+        return typeId;
     }
 
-    public void setType_id(Integer type_id) {
-        this.type_id = type_id;
+    public void setTypeId(Integer type_id) {
+        this.typeId = type_id;
     }
 
     public String getPath() {
@@ -56,8 +60,13 @@ public class BookFile {
         return "BookFile{" +
                 "id=" + id +
                 ", hash='" + hash + '\'' +
-                ", type_id=" + type_id +
+                ", typeId=" + typeId +
                 ", path='" + path + '\'' +
+                ", book=" + book +
                 '}';
+    }
+
+    public String getBookFileExtensionString(){
+        return BookFileType.getExtensionStringByTypeId(typeId);
     }
 }
