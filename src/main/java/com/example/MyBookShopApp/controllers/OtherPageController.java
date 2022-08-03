@@ -48,10 +48,10 @@ public class OtherPageController {
         return "/postponed";
     }
 
-    @GetMapping("/search")
-    public String searchPage(){
-        return "/search/index";
-    }
+//    @GetMapping("/search")
+//    public String searchPage(){
+//        return "/search/index";
+//    }
 
     @GetMapping("/signin")
     public String signinPage(){

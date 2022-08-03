@@ -1,14 +1,19 @@
 package com.example.MyBookShopApp.controllers;
 
+import com.example.MyBookShopApp.data.ApiResponse;
 import com.example.MyBookShopApp.data.Book;
 import com.example.MyBookShopApp.data.BookService;
 import com.example.MyBookShopApp.data.SearchWordDto;
+import com.example.MyBookShopApp.errs.BookstoreApiWrongParameterException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import liquibase.pro.packaged.B;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,14 +30,28 @@ public class BooksRestApiController {
 
     @GetMapping("/books/by-author")
     @ApiOperation("operation to get book of bookshop by author passed author first name")
-    public ResponseEntity<List<Book>> booksByAuthor(@RequestParam("author") String authorName){
-        return ResponseEntity.ok(service.getBooksByAuthor(authorName));
+    public ResponseEntity<ApiResponse<Book>> booksByAuthor(@RequestParam("author") String authorName){
+        ApiResponse<Book> response = new ApiResponse<>();
+        List<Book> data = service.getBooksByAuthor(authorName);
+        response.setDebugMessage("successful request");
+        response.setMessage("data size: " + data.size() + " elements");
+        response.setStatus(HttpStatus.OK);
+        response.setTimeStamp(LocalDateTime.now());
+        response.setData(data);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/books/by-title")
     @ApiOperation("operation to get book of bookshop by title")
-    public ResponseEntity<List<Book>> booksByTitle(@RequestParam("title") String title){
-        return ResponseEntity.ok(service.getBooksByTitle(title));
+    public ResponseEntity<ApiResponse<Book>>  booksByTitle(@RequestParam("title") String title) throws BookstoreApiWrongParameterException {
+        ApiResponse<Book> response = new ApiResponse<>();
+        List<Book> data = service.getBooksByTitle(title);
+        response.setDebugMessage("successful request");
+        response.setMessage("data size: " + data.size() + " elements");
+        response.setStatus(HttpStatus.OK);
+        response.setTimeStamp(LocalDateTime.now());
+        response.setData(data);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/books/by-price")
@@ -70,5 +89,15 @@ public class BooksRestApiController {
         return new ArrayList<>();
     }
 
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<ApiResponse<Book>> handlerMissingServletRequestParameterException(Exception exception){
+        return new ResponseEntity<>(new ApiResponse<Book>(HttpStatus.BAD_REQUEST,"Missing reqiered parameters", exception), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(BookstoreApiWrongParameterException.class)
+    public ResponseEntity<ApiResponse<Book>> handlerBookstoreApiWrongParameterException(Exception exception){
+        return new ResponseEntity<>(new ApiResponse<Book>(HttpStatus.BAD_REQUEST,"Bad parameters value", exception), HttpStatus.BAD_REQUEST);
+    }
 }
 

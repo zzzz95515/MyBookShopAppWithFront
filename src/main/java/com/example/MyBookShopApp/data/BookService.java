@@ -1,5 +1,6 @@
 package com.example.MyBookShopApp.data;
 
+import com.example.MyBookShopApp.errs.BookstoreApiWrongParameterException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -36,8 +37,18 @@ public class BookService {
         return repository.findBooksByAuthor_FirstNameContaining(authorName);
     }
 
-    public List<Book> getBooksByTitle(String title){
-        return repository.findBooksByTitleContaining(title);
+    public List<Book> getBooksByTitle(String title) throws BookstoreApiWrongParameterException {
+        if (title.equals("")||title.length()<=1){
+            throw new BookstoreApiWrongParameterException("Wrong values passed to one or more parameters");
+        }else {
+            List<Book> result= repository.findBooksByTitleContaining(title);
+            if (result.size()>0){
+                return result;
+            }else {
+                throw new BookstoreApiWrongParameterException("No data found with this parameters");
+            }
+
+        }
     }
 
     public List<Book> getBooksWithPriceBetween(Double min, Double max){
