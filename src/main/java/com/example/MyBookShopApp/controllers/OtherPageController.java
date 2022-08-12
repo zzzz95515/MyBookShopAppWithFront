@@ -43,10 +43,10 @@ public class OtherPageController {
         return "/documents/index";
     }
 
-    @GetMapping("/postponed")
-    public String postponedPage(){
-        return "/postponed";
-    }
+//    @GetMapping("/postponed")
+//    public String postponedPage(){
+//        return "/postponed";
+//    }
 
 //    @GetMapping("/search")
 //    public String searchPage(){
@@ -58,8 +58,8 @@ public class OtherPageController {
         return "/signin";
     }
 
-    @GetMapping("/cart")
-    public String cartPage(){
-        return "/cart";
-    }
+//    @GetMapping("/cart")
+//    public String cartPage(){
+//        return "/cart";
+//    }
 }

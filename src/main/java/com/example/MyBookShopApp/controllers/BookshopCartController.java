@@ -10,10 +10,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.StringJoiner;
+import java.util.*;
+import java.util.logging.Logger;
 
 @Controller
 @RequestMapping("/books")
@@ -55,7 +53,7 @@ public class BookshopCartController {
     }
 
 
-    @PostMapping("/changeBookStatus/{slug}")
+    @PostMapping("/changeBookStatus/cart/{slug}")
     public String handleChangeBookStatus(@PathVariable(name = "slug") String slug, @CookieValue(name = "cartContents", required = false) String cartContents, HttpServletResponse response, Model model){
 
         if (cartContents == null || cartContents.equals("")) {
@@ -71,7 +69,6 @@ public class BookshopCartController {
             response.addCookie(cookie);
             model.addAttribute("isCartEmpty", false);
         }
-//        return "";
         return "redirect:/books/" + slug;
     }
 
