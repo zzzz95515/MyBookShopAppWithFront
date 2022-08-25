@@ -6,19 +6,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sun.istack.NotNull;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import io.swagger.models.auth.In;
-import liquibase.util.csv.opencsv.bean.MappingStrategy;
 import org.hibernate.annotations.Type;
-import org.thymeleaf.expression.Maps;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "books")
@@ -93,6 +87,18 @@ public class Book implements Serializable {
     @OneToMany
     @JsonIgnore
     private List<BookRateEntity> bookRate = new ArrayList<>();
+
+    @OneToMany
+    @JsonIgnore
+    private List<BookReviewsEnt> bookReviews = new ArrayList<>();
+
+    public List<BookReviewsEnt> getBookReviews() {
+        return bookReviews;
+    }
+
+    public void setBookReviews(List<BookReviewsEnt> bookReviews) {
+        this.bookReviews = bookReviews;
+    }
 
     public List<BookRateEntity> getBookRate() {
         return bookRate;

@@ -51,7 +51,9 @@ public class PostponedController {
     }
 
     @PostMapping("/changeBookStatus/kept/remove/{slug}")
-    public String handleRemoveBookFromCartRequest(@PathVariable(name = "slug") String slug, @CookieValue(name = "keptContents", required = false) String cartContents, HttpServletResponse response, Model model){
+    public String handleRemoveBookFromCartRequest(@PathVariable(name = "slug") String slug,
+                                                  @CookieValue(name = "keptContents", required = false) String cartContents,
+                                                  HttpServletResponse response, Model model){
 
         if (cartContents != null && !cartContents.equals("")){
             ArrayList<String> cookieBooks = new ArrayList<>(Arrays.asList(cartContents.split("/")));
