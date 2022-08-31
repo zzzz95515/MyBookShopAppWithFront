@@ -53,10 +53,10 @@ public class OtherPageController {
 //        return "/search/index";
 //    }
 
-    @GetMapping("/signin")
-    public String signinPage(){
-        return "/signin";
-    }
+//    @GetMapping("/signin")
+//    public String signinPage(){
+//        return "/signin";
+//    }
 
 //    @GetMapping("/cart")
 //    public String cartPage(){
