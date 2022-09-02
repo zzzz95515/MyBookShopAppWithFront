@@ -1,12 +1,16 @@
 package com.example.MyBookShopApp.security;
 
 
-import com.example.MyBookShopApp.data.Book;
 import com.example.MyBookShopApp.data.SearchWordDto;
+import com.example.MyBookShopApp.data.Book;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,8 +58,36 @@ public class AuthUserController {
     }
 
 
+    @PostMapping("/login")
+    @ResponseBody
+    public ContactConfirmationResponse handleLogin(@RequestBody ContactConfirmationPayLoad payload){
+        return userRegister.login(payload);
+    }
 
+    @GetMapping("/my")
+    public String handleMy(){
+        return "/my";
+    }
 
+    @GetMapping("/profile")
+    public String handleProfile(Model model){
+        model.addAttribute("curUser",userRegister.getCurrentUser());
+        return "/profile";
+    }
+
+    @GetMapping("/logout")
+    public String handleLogout(HttpServletRequest request){
+        HttpSession session = request.getSession();
+        SecurityContextHolder.clearContext();
+        if (session!=null){
+            session.invalidate();
+        }
+
+        for (Cookie cookie : request.getCookies()){
+            cookie.setMaxAge(0);
+        }
+        return "redirect:/";
+    }
 
 
     @ModelAttribute("searchWordDto")
