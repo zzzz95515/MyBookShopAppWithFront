@@ -1,5 +1,6 @@
 package com.example.MyBookShopApp.security;
 
+import com.example.MyBookShopApp.security.jwt.JWTUtil;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -15,10 +16,15 @@ public class BookstoreUserRegister {
 
     private final PasswordEncoder passwordEncoder;
 
-    public BookstoreUserRegister(AuthenticationManager authenticationManager, BookstoreUserRepository bookstoreUserRepository, PasswordEncoder passwordEncoder) {
+    private final BookstoreUserDetailsService userDetailsService;
+    private final JWTUtil jwtUtil;
+
+    public BookstoreUserRegister(AuthenticationManager authenticationManager, BookstoreUserRepository bookstoreUserRepository, PasswordEncoder passwordEncoder, BookstoreUserDetailsService userDetailsService, JWTUtil jwtUtil) {
         this.authenticationManager = authenticationManager;
         this.bookstoreUserRepository = bookstoreUserRepository;
         this.passwordEncoder = passwordEncoder;
+        this.userDetailsService = userDetailsService;
+        this.jwtUtil = jwtUtil;
     }
 
     public void registerNewUser(RegistrationForm registrationForm){
@@ -33,11 +39,25 @@ public class BookstoreUserRegister {
         }
     }
 
+    public ContactConfirmationResponse jwtLogin(ContactConfirmationPayLoad payload) {
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(payload.getContact(),
+                payload.getCode()));
+        BookstoreUserDetails userDetails =
+                (BookstoreUserDetails) userDetailsService.loadUserByEmail(payload.getContact());
+
+        String jwtToken = jwtUtil.generateToken(userDetails);
+        ContactConfirmationResponse response = new ContactConfirmationResponse();
+        response.setResult(jwtToken);
+        return response;
+    }
+
+
+
     public ContactConfirmationResponse login(ContactConfirmationPayLoad payload) {
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(payload.getContact(),payload.getCode()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         ContactConfirmationResponse response = new ContactConfirmationResponse();
-        response.setResult(true);
+        response.setResult("true");
         return response;
     }
 
