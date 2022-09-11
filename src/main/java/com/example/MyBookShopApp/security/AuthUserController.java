@@ -87,7 +87,7 @@ public class AuthUserController {
     }
 
     @GetMapping("/logout")
-    public String handleLogout(HttpServletRequest request){
+    public String handleLogout(HttpServletRequest request, HttpServletResponse response){
         HttpSession session = request.getSession();
         SecurityContextHolder.clearContext();
         if (session!=null){
@@ -101,6 +101,7 @@ public class AuthUserController {
                 blackListRepository.save(blackList);
             }
             cookie.setMaxAge(0);
+            response.addCookie(cookie);
         }
         return "redirect:/";
     }
