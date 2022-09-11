@@ -3,6 +3,8 @@ package com.example.MyBookShopApp.security;
 
 import com.example.MyBookShopApp.data.SearchWordDto;
 import com.example.MyBookShopApp.data.Book;
+import com.example.MyBookShopApp.security.jwt.BlackListRepository;
+import com.example.MyBookShopApp.security.jwt.JWTBlackList;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,9 +20,11 @@ import java.util.List;
 @Controller
 public class AuthUserController {
 
+    private final BlackListRepository blackListRepository;
     private final BookstoreUserRegister userRegister;
 
-    public AuthUserController(BookstoreUserRegister userRegister) {
+    public AuthUserController(BlackListRepository blackListRepository, BookstoreUserRegister userRegister) {
+        this.blackListRepository = blackListRepository;
         this.userRegister = userRegister;
     }
 
@@ -43,6 +47,8 @@ public class AuthUserController {
         return response;
     }
 
+
+
     @PostMapping("/reg")
     public String handleUserRegistration(RegistrationForm registrationForm, Model model){
         userRegister.registerNewUser(registrationForm);
@@ -64,6 +70,7 @@ public class AuthUserController {
     public ContactConfirmationResponse handleLogin(@RequestBody ContactConfirmationPayLoad payload, HttpServletResponse response){
         ContactConfirmationResponse loginResponce = userRegister.jwtLogin(payload);
         Cookie cookie= new Cookie("token", loginResponce.getResult());
+        cookie.setMaxAge(1000*60*60*24*365);
         response.addCookie(cookie);
         return loginResponce;
     }
@@ -79,19 +86,24 @@ public class AuthUserController {
         return "/profile";
     }
 
-//    @GetMapping("/logout")
-//    public String handleLogout(HttpServletRequest request){
-//        HttpSession session = request.getSession();
-//        SecurityContextHolder.clearContext();
-//        if (session!=null){
-//            session.invalidate();
-//        }
-//
-//        for (Cookie cookie : request.getCookies()){
-//            cookie.setMaxAge(0);
-//        }
-//        return "redirect:/";
-//    }
+    @GetMapping("/logout")
+    public String handleLogout(HttpServletRequest request){
+        HttpSession session = request.getSession();
+        SecurityContextHolder.clearContext();
+        if (session!=null){
+            session.invalidate();
+        }
+
+
+        for (Cookie cookie : request.getCookies()){
+            if (cookie.getName().equals("token")){
+                JWTBlackList blackList = new JWTBlackList(cookie.getValue());
+                blackListRepository.save(blackList);
+            }
+            cookie.setMaxAge(0);
+        }
+        return "redirect:/";
+    }
 
 
     @ModelAttribute("searchWordDto")
@@ -103,5 +115,6 @@ public class AuthUserController {
     public List<Book> searchResults(){
         return new ArrayList<>();
     }
+
 
 }

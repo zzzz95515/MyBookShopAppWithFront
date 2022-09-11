@@ -307,7 +307,7 @@
                     </div>
                   </button>
                 </div>
-                <div class="ProductCard-assessment"><span class="ProductCard-titleProp">Оцените книгу:</span><span class="Rating Rating_input" th:attr="data-bookid = ${bookBySlug.slug}"  data-bookid="2121"><span class="Rating-stars"><span class="Rating-star">
+                <div class="ProductCard-assessment"><span class="ProductCard-titleProp">Оцените книгу:</span><span class="Rating Rating_input" th:attr="data-bookId = ${bookBySlug.slug}"  data-bookid="2121"><span class="Rating-stars"><span class="Rating-star">
                         <svg xmlns="http://www.w3.org/2000/svg" width="19" height="18" viewBox="0 0 19 18">
                           <g>
                             <g>
@@ -348,6 +348,8 @@
                           </g>
                         </svg></span>
                       <input name="rating" type="radio" value="5"/></span></span>
+                  <br>
+                  <span th:if="${authFaildForRate}">авторизуйтесь для данного действия</span>
                 </div>
                 <div class="ProductCard-tags"><span class="ProductCard-titleProp">Тэги:</span><a href="/tags/">Современные</a>,&#32;<a href="/tags/" th:text="${bookBySlug.tag}">Психологическая проза</a>
                 </div>
@@ -423,7 +425,7 @@
                 <div class="form-group">
                   <textarea class="form-textarea Comments-review" name="review" id="review" placeholder="Текст отзыва" data-validate="require"></textarea>
                 </div>
-                <div class="form-group Comments-sendReview">
+                <div th:if="authFaildForRate" class="form-group Comments-sendReview">
                   <button class="btn btn_warning" type="submit">Отправить отзыв
                   </button>
                 </div>

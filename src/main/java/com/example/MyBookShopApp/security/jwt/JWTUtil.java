@@ -17,6 +17,12 @@ public class JWTUtil {
     @Value("${auth.secret}")
     private String secret;
 
+    private final BlackListRepository blackListRepository;
+
+    public JWTUtil(BlackListRepository blackListRepository) {
+        this.blackListRepository = blackListRepository;
+    }
+
     private String createToken(Map<String, Object> claims, String username) {
         return Jwts
                 .builder()
@@ -55,7 +61,10 @@ public class JWTUtil {
 
     public Boolean validateToken(String token, UserDetails userDetails){
         String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+        JWTBlackList blackList=blackListRepository.findByToken(token);
+        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token) && blackList==null);
     }
+
+
 
 }

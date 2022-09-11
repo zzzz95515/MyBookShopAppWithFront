@@ -6,6 +6,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -62,7 +63,25 @@ public class BookstoreUserRegister {
     }
 
     public Object getCurrentUser() {
-        BookstoreUserDetails userDetails = (BookstoreUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        BookstoreUserDetails userDetails;
+        try {
+            userDetails = (BookstoreUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        }
+        catch (Exception e){
+            try {
+                DefaultOAuth2User defaultOAuth2User =
+                        (DefaultOAuth2User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+                BookstoreUser bookstoreUser = new BookstoreUser();
+                bookstoreUser.setName(defaultOAuth2User.getAttribute("name"));
+                bookstoreUser.setEmail(defaultOAuth2User.getAttribute("email"));
+                userDetails = new BookstoreUserDetails(bookstoreUser);
+            }
+            catch (Exception ex){
+                userDetails=new BookstoreUserDetails(null);
+            }
+
+        }
+
         return userDetails.getBookstoreUser();
     }
 }

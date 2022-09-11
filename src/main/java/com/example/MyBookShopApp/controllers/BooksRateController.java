@@ -2,13 +2,14 @@ package com.example.MyBookShopApp.controllers;
 
 
 import com.example.MyBookShopApp.data.*;
+import com.example.MyBookShopApp.security.BookstoreUser;
+import com.example.MyBookShopApp.security.BookstoreUserRegister;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
 
 @Controller
@@ -19,36 +20,40 @@ public class BooksRateController {
 
     private final BookReviewsRepository reviewsRepository;
 
+    private final BookstoreUserRegister userRegister;
 
-    public BooksRateController(BookRepository repository, BookRateRepository rateRepository, BookReviewsRepository reviewsRepository) {
+
+    public BooksRateController(BookRepository repository, BookRateRepository rateRepository, BookReviewsRepository reviewsRepository, BookstoreUserRegister userRegister) {
         this.repository = repository;
         this.rateRepository = rateRepository;
         this.reviewsRepository = reviewsRepository;
+        this.userRegister = userRegister;
     }
 
     @PostMapping("/rateBook")
-    public String rateBook(@RequestParam("bookId") String bookSlug, @RequestParam("value")Integer value){
-        Book book = repository.findBookBySlug(bookSlug);
-        rateRepository.save(new BookRateEntity(value,book));
-        return ("redirect:/books/"+bookSlug);
+    public String rateBook(@RequestBody RateBookResponce bookResponce, Model model){
+        if (userRegister.getCurrentUser()!=null){
+            Book book = repository.findBookBySlug(bookResponce.getBookId());
+            rateRepository.save(new BookRateEntity(bookResponce.getValue(),book));
+        }
+        else {
+            model.addAttribute("AuthFaildForRate",true);
+            throw new UsernameNotFoundException("зарегистрируйтесь, чтобы оставить оценку");
+        }
+        return ("redirect:/books/"+bookResponce.getBookId());
     }
 
     @PostMapping("/bookReview")
-    public String reviewBook(@RequestParam("bookId") String slug, @RequestParam("text") String reviewText,
-                             @CookieValue(name = "guestName", required = false) String guestName,
-                             HttpServletResponse response){
-        String guestsName=guestName;
-        if (guestName==null || guestName.equals("")){
-            String newGuestName = "newGuest"+response.hashCode();
-            guestsName=newGuestName;
-            Cookie cookie = new Cookie("guestName",newGuestName);
-            response.addCookie(cookie);
+    public String reviewBook(@RequestBody ReviewBookResponce bookResponce){
+        BookstoreUser bookstoreUser= (BookstoreUser) userRegister.getCurrentUser();
+        if (bookstoreUser!=null){
+            Book book = repository.findBookBySlug(bookResponce.getBookId());
+            Date date = new Date();
+            BookReviewsEnt review = new BookReviewsEnt(0,0,bookResponce.getText(), bookstoreUser.getName(),book,date);
+            reviewsRepository.save(review);
         }
-        Book book = repository.findBookBySlug(slug);
-        Date date = new Date();
-        BookReviewsEnt review = new BookReviewsEnt(0,0,reviewText,guestsName,book,date);
-        reviewsRepository.save(review);
-        return ("redirect:/books/"+slug);
+
+        return ("redirect:/books/"+bookResponce.getBookId());
     }
 
     @PostMapping("/rateBookReview")

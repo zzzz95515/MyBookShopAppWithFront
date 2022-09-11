@@ -2,6 +2,7 @@ package com.example.MyBookShopApp.security.jwt;
 
 import com.example.MyBookShopApp.security.BookstoreUserDetails;
 import com.example.MyBookShopApp.security.BookstoreUserDetailsService;
+import io.jsonwebtoken.JwtException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -38,18 +39,23 @@ public class JWTRequestFilter extends OncePerRequestFilter{
             for (Cookie cookie : cookies) {
                 if (cookie.getName().equals("token")) {
                     token = cookie.getValue();
-                    username = jwtUtil.extractUsername(token);
-                }
+                    try {
+                        username = jwtUtil.extractUsername(token);
+                        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                            BookstoreUserDetails userDetails = (BookstoreUserDetails) bookstoreUserDetailsService.loadUserByUsername(username);
+                            if (jwtUtil.validateToken(token, userDetails)) {
+                                UsernamePasswordAuthenticationToken authenticationToken =
+                                        new UsernamePasswordAuthenticationToken(
+                                                userDetails, null, userDetails.getAuthorities());
 
-                if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                    BookstoreUserDetails userDetails = (BookstoreUserDetails) bookstoreUserDetailsService.loadUserByUsername(username);
-                    if (jwtUtil.validateToken(token, userDetails)) {
-                        UsernamePasswordAuthenticationToken authenticationToken =
-                                new UsernamePasswordAuthenticationToken(
-                                        userDetails, null, userDetails.getAuthorities());
-
-                        authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpServletRequest));
-                        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                                authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpServletRequest));
+                                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                            }
+                        }
+                    }
+                    catch (JwtException e){
+                        cookie.setMaxAge(0);
+                        httpServletResponse.addCookie(cookie);
                     }
                 }
             }

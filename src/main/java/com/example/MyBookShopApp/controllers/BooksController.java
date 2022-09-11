@@ -1,26 +1,35 @@
 package com.example.MyBookShopApp.controllers;
 
 import com.example.MyBookShopApp.data.*;
-import javassist.bytecode.ByteArray;
+import com.example.MyBookShopApp.security.BookstoreUserRegister;
+import com.example.MyBookShopApp.security.jwt.JWTUtil;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.Serializable;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
 
 @Controller
 @RequestMapping("/books")
 public class BooksController {
+
+
+
+    private final BookstoreUserRegister userRegister;
+
 
 
     private final BookRepository bookRepository;
@@ -30,7 +39,8 @@ public class BooksController {
 
     private final BookReviewsRepository bookReviewsRepository;
 
-    public BooksController(BookRepository bookRepository, ResourceStorage storage, BookRateRepository bookRateRepository, BookReviewsRepository bookReviewsRepository) {
+    public BooksController(BookstoreUserRegister userRegister, BookRepository bookRepository, ResourceStorage storage, BookRateRepository bookRateRepository, BookReviewsRepository bookReviewsRepository) {
+        this.userRegister = userRegister;
         this.bookRepository = bookRepository;
         this.storage = storage;
         this.bookRateRepository = bookRateRepository;
@@ -110,6 +120,8 @@ public class BooksController {
     }
 
 
+
+
     @GetMapping("/download/{hash}")
     public ResponseEntity<ByteArrayResource> bookFile(@PathVariable("hash") String hash) throws IOException {
         Path path = storage.getBookFilePath(hash);
@@ -127,4 +139,59 @@ public class BooksController {
                 .body(new ByteArrayResource(data));
     }
 
+    @ModelAttribute("authFaildForRate")
+    public Boolean isNotAuthentificated(){
+        if (userRegister.getCurrentUser()!=null){
+            return false;
+        }
+        else {
+            return true;
+        }
+
+    }
+
+    @PostMapping("/rateBook")
+    public String rateBook(@RequestBody RateBookResponce bookResponce, Model model){
+        if (userRegister.getCurrentUser()!=null){
+            Book book = bookRepository.findBookBySlug(bookResponce.getBookId());
+            bookRateRepository.save(new BookRateEntity(bookResponce.getValue(),book));
+        }
+        else {
+            throw new UsernameNotFoundException("зарегистрируйтесь, чтобы оставить оценку");
+        }
+        return ("redirect:/books/"+bookResponce.getBookId());
+    }
+
+    @PostMapping("/bookReview")
+    public String reviewBook(@RequestParam("bookId") String slug, @RequestParam("text") String reviewText,
+                             @CookieValue(name = "guestName", required = false) String guestName,
+                             HttpServletResponse response){
+        String guestsName=guestName;
+        if (guestName==null || guestName.equals("")){
+            String newGuestName = "newGuest"+response.hashCode();
+            guestsName=newGuestName;
+            Cookie cookie = new Cookie("guestName",newGuestName);
+            response.addCookie(cookie);
+        }
+        Book book = bookRepository.findBookBySlug(slug);
+        Date date = new Date();
+        BookReviewsEnt review = new BookReviewsEnt(0,0,reviewText,guestsName,book,date);
+        bookReviewsRepository.save(review);
+        return ("redirect:/books/"+slug);
+    }
+
+    @PostMapping("/rateBookReview")
+    public String rateReview(@RequestParam("reviewid") Integer reviewId, @RequestParam("value") Integer value){
+        BookReviewsEnt review = bookReviewsRepository.getById(reviewId);
+        switch (value){
+            case (1):
+                review.setPosRate(review.getPosRate()+1);
+                break;
+            case (-1):
+                review.setNegRate(review.getNegRate()+1);
+                break;
+        }
+        bookReviewsRepository.save(review);
+        return ("redirect:/books/"+review.getBook().getSlug());
+    }
 }
