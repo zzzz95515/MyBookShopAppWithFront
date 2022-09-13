@@ -28,7 +28,7 @@ public class BookstoreUserRegister {
         this.jwtUtil = jwtUtil;
     }
 
-    public void registerNewUser(RegistrationForm registrationForm){
+    public BookstoreUser registerNewUser(RegistrationForm registrationForm){
         if (bookstoreUserRepository.findBookstoreUserByEmail(registrationForm.getEmail())==null){
             BookstoreUser user = new BookstoreUser();
             user.setName(registrationForm.getName());
@@ -37,7 +37,9 @@ public class BookstoreUserRegister {
             user.setPassword(passwordEncoder.encode(registrationForm.getPass()));
 
             bookstoreUserRepository.save(user);
+            return user;
         }
+        return null;
     }
 
     public ContactConfirmationResponse jwtLogin(ContactConfirmationPayLoad payload) {
