@@ -4,16 +4,12 @@ package com.example.MyBookShopApp.security;
 import com.example.MyBookShopApp.data.SearchWordDto;
 import com.example.MyBookShopApp.data.Book;
 import com.example.MyBookShopApp.security.jwt.BlackListRepository;
-import com.example.MyBookShopApp.security.jwt.JWTBlackList;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -83,7 +79,7 @@ public class AuthUserController {
     @GetMapping("/profile")
     public String handleProfile(Model model){
         model.addAttribute("curUser",userRegister.getCurrentUser());
-        return "/profile";
+        return "profile";
     }
 
 //    @GetMapping("/logout")
