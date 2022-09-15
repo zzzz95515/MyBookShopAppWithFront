@@ -30,11 +30,4 @@ class BookstoreUserRepositoryTests {
 
     }
 
-    @Test
-    void findBookstoreUserByEmail() {
-    }
-
-    @Test
-    void findBookstoreUserByName() {
-    }
 }

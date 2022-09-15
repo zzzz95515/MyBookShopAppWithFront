@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.TestPropertySource;
 
 import java.awt.print.Book;
 import java.util.function.BooleanSupplier;
@@ -17,11 +18,14 @@ import static org.junit.jupiter.api.Assertions.*;
 
 
 @SpringBootTest
+@TestPropertySource("/application-test.properties")
 class BookstoreUserRegisterTests {
 
     private final BookstoreUserRegister userRegister;
     private final PasswordEncoder passwordEncoder;
     private RegistrationForm registrationForm;
+
+    private ContactConfirmationPayLoad payload = new ContactConfirmationPayLoad();
 
     @MockBean
     private BookstoreUserRepository bookstoreUserRepositoryMock;
@@ -39,11 +43,14 @@ class BookstoreUserRegisterTests {
         registrationForm.setName("test use1r");
         registrationForm.setPhone("79059999999");
         registrationForm.setPass("999999");
+        payload.setCode("123456");
+        payload.setContact("zzzz95515@gmail.com");
 
     }
 
     @AfterEach
     void tearDown() {
+        payload=null;
         registrationForm=null;
     }
 
@@ -67,4 +74,6 @@ class BookstoreUserRegisterTests {
         BookstoreUser user = userRegister.registerNewUser(registrationForm);
         assertNull(user);
     }
+
+
 }

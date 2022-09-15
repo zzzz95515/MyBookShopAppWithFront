@@ -51,4 +51,22 @@ class MainPageSeleniumTests {
         assertTrue(driver.getPageSource().contains("King of Kings"));
     }
 
+    @Test
+    public void testNavigation() throws InterruptedException {
+        MainPage mainPage = new MainPage(driver);
+        mainPage.callPage()
+                .pause()
+                .clickTo("Genres")
+                .pause()
+                .clickTo("News")
+                .pause()
+                .clickTo("Popular")
+                .pause()
+                .clickTo("Authors")
+                .pause()
+                .clickTo("Main")
+                .pause()
+                .clickTo("King of Kings");
+    }
+
 }

@@ -20,6 +20,11 @@ public class MainPage {
         return this;
     }
 
+    public MainPage getPage(){
+        driver.get(url);
+        return this;
+    }
+
     public MainPage pause() throws InterruptedException {
         Thread.sleep(2000);
         return this;
@@ -34,6 +39,12 @@ public class MainPage {
     public MainPage submit() {
         WebElement element = driver.findElement(By.id("search"));
         element.submit();
+        return this;
+    }
+
+    public MainPage clickTo(String linkText){
+        WebElement element = driver.findElement(By.linkText(linkText));
+        element.click();
         return this;
     }
 }

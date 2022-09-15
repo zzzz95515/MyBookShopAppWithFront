@@ -35,6 +35,19 @@ public class BookReviewsEnt {
     @NotNull
     private String usersName;
 
+    @Override
+    public String toString() {
+        return "BookReviewsEnt{" +
+                "id=" + id +
+                ", posRate=" + posRate +
+                ", negRate=" + negRate +
+                ", review='" + review + '\'' +
+                ", usersName='" + usersName + '\'' +
+                ", book=" + book +
+                ", date=" + date +
+                '}';
+    }
+
     @ManyToOne
     @JoinColumn(name = "book_slug",referencedColumnName = "slug")
     @NotNull
