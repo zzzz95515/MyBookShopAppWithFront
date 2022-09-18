@@ -32,4 +32,14 @@ public class AspectForLogging {
     public void logCurUser(JoinPoint joinPoint, BookstoreUser response){
         logger.info("current user is: " + response.toString());
     }
+
+    @Pointcut(value = "within(com.example.MyBookShopApp.controllers.*)")
+    public void allControllers(){
+
+    }
+
+    @Before(value = "allControllers()")
+    public void controllerSratr(JoinPoint joinPoint){
+        logger.info(joinPoint.getTarget().toString() + " start  work with method " + joinPoint.toShortString());
+    }
 }
