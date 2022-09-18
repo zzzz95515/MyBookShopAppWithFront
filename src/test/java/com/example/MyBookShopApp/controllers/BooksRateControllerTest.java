@@ -59,9 +59,9 @@ class BooksRateControllerTest {
     @Test
     public void rateReviewTest(){
         BookReviewsEnt review = bookReviewsRepository.findById(1).get();
-        String resp=service.rateBookReview(1,review);
+        BookReviewsEnt resp=service.rateBookReview(1,review);
         assertEquals("+1", resp);
-        String resp2=service.rateBookReview(-1,review);
+        BookReviewsEnt resp2=service.rateBookReview(-1,review);
         assertEquals("-1",resp2);
 
     }

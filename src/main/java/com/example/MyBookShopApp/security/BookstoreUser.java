@@ -51,6 +51,17 @@ public class BookstoreUser {
         return password;
     }
 
+    @Override
+    public String toString() {
+        return "BookstoreUser{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                ", phone='" + phone + '\'' +
+                ", password='" + password + '\'' +
+                '}';
+    }
+
     public void setPassword(String password) {
         this.password = password;
     }

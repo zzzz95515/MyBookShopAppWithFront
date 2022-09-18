@@ -1,10 +1,10 @@
 package com.example.MyBookShopApp.data;
 
+import com.example.MyBookShopApp.logger.LogForSavingMethods;
 import com.example.MyBookShopApp.security.BookstoreUser;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
-import java.util.Optional;
 
 @Service
 public class BookRateReviewService {
@@ -19,21 +19,26 @@ public class BookRateReviewService {
         this.rateRepository = rateRepository;
     }
 
-    public String saveBookRate(RateBookResponce bookResponce){
+    @LogForSavingMethods
+    public BookRateEntity saveBookRate(RateBookResponce bookResponce){
         Book book = bookRepository.findBookBySlug(bookResponce.getBookId());
-        rateRepository.save(new BookRateEntity(bookResponce.getValue(),book));
-        return bookResponce.getBookId();
+        BookRateEntity review = new BookRateEntity(bookResponce.getValue(),book);
+        rateRepository.save(review);
+        return review;
     }
 
-    public String saveBookReview(ReviewBookResponce bookResponce, BookstoreUser bookstoreUser){
+    @LogForSavingMethods
+    public BookReviewsEnt saveBookReview(ReviewBookResponce bookResponce, BookstoreUser bookstoreUser){
         Book book = bookRepository.findBookBySlug(bookResponce.getBookId());
         Date date = new Date();
         BookReviewsEnt review = new BookReviewsEnt(0,0,bookResponce.getText(), bookstoreUser.getName(),book,date);
         reviewsRepository.save(review);
-        return bookResponce.getBookId();
+        return review;
     }
 
-    public String rateBookReview(Integer value, BookReviewsEnt review){
+
+    @LogForSavingMethods
+    public BookReviewsEnt rateBookReview(Integer value, BookReviewsEnt review){
         String resp="";
         Integer posRate=review.getPosRate();
         Integer negRate=review.getNegRate();
@@ -49,7 +54,7 @@ public class BookRateReviewService {
             default:resp="Incorrect";
         }
         reviewsRepository.save(review);
-        return resp;
+        return review;
     }
 
 

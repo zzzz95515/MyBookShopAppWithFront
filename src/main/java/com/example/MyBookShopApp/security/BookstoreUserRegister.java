@@ -1,5 +1,7 @@
 package com.example.MyBookShopApp.security;
 
+import com.example.MyBookShopApp.logger.CurrentUser;
+import com.example.MyBookShopApp.logger.LogForSavingMethods;
 import com.example.MyBookShopApp.security.jwt.JWTUtil;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -28,6 +30,7 @@ public class BookstoreUserRegister {
         this.jwtUtil = jwtUtil;
     }
 
+    @LogForSavingMethods
     public BookstoreUser registerNewUser(RegistrationForm registrationForm){
         if (bookstoreUserRepository.findBookstoreUserByEmail(registrationForm.getEmail())==null){
             BookstoreUser user = new BookstoreUser();
@@ -64,6 +67,7 @@ public class BookstoreUserRegister {
         return response;
     }
 
+    @CurrentUser
     public Object getCurrentUser() {
         BookstoreUserDetails userDetails;
         try {
