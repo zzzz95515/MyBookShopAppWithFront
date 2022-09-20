@@ -4,6 +4,9 @@ package com.example.MyBookShopApp.security;
 import com.example.MyBookShopApp.data.SearchWordDto;
 import com.example.MyBookShopApp.data.Book;
 import com.example.MyBookShopApp.security.jwt.BlackListRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -19,9 +22,16 @@ public class AuthUserController {
     private final BlackListRepository blackListRepository;
     private final BookstoreUserRegister userRegister;
 
-    public AuthUserController(BlackListRepository blackListRepository, BookstoreUserRegister userRegister) {
+    private final SmsService smsService;
+
+    private final JavaMailSender javaMailSender;
+
+    @Autowired
+    public AuthUserController(BlackListRepository blackListRepository, BookstoreUserRegister userRegister, SmsService smsService, JavaMailSender javaMailSender) {
         this.blackListRepository = blackListRepository;
         this.userRegister = userRegister;
+        this.smsService = smsService;
+        this.javaMailSender = javaMailSender;
     }
 
     @GetMapping("/signin")
@@ -43,6 +53,23 @@ public class AuthUserController {
         return response;
     }
 
+    @PostMapping("/requestEmailConfirmation")
+    @ResponseBody
+    public ContactConfirmationResponse handleRequestEmailConfirmation(@RequestBody ContactConfirmationPayLoad payLoad){
+        ContactConfirmationResponse response = new ContactConfirmationResponse();
+        response.setResult("true");
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom("zzzz95515@mail.ru");
+        message.setTo(payLoad.getContact());
+        SmsCode smsCode = new SmsCode(smsService.generateCode(), 300);
+        smsService.saveNewCode(smsCode);
+        message.setSubject("BookStore mail verification!");
+        message.setText("verification code is: "+smsCode.getCode());
+        javaMailSender.send(message);
+        return response;
+    }
+
+
 
 
     @PostMapping("/reg")
@@ -56,8 +83,20 @@ public class AuthUserController {
     @ResponseBody
     public ContactConfirmationResponse handleApproveContact(@RequestBody ContactConfirmationPayLoad payLoad){
         ContactConfirmationResponse response = new ContactConfirmationResponse();
-        response.setResult("true");
-        return response;
+        if (payLoad.getContact().contains("@")){
+            if (smsService.verifyCode(payLoad.getCode())){
+                response.setResult("true");
+                return response;
+            }
+            else {
+                return new ContactConfirmationResponse();
+            }
+        }
+        else {
+            response.setResult("true");
+            return response;
+        }
+
     }
 
 
