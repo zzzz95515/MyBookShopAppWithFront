@@ -35,6 +35,16 @@ public class Author {
 //    @NotNull
     private String slug;
 
+    public Author(List<String> authors) {
+        if (authors!=null){
+            this.firstName=authors.toString();
+        }
+    }
+
+    public Author(){
+
+    }
+
     public String getPhoto() {
         return photo;
     }

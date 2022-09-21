@@ -1,12 +1,18 @@
 package com.example.MyBookShopApp.data;
 
+import com.example.MyBookShopApp.data.google.Item;
+import com.example.MyBookShopApp.data.google.Root;
 import com.example.MyBookShopApp.errs.BookstoreApiWrongParameterException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -15,9 +21,12 @@ public class BookService {
 
     BookRepository repository;
 
+    private RestTemplate restTemplate;
+
     @Autowired
-    public BookService(BookRepository repository) {
+    public BookService(BookRepository repository, RestTemplate restTemplate) {
         this.repository = repository;
+        this.restTemplate = restTemplate;
     }
 
     public List<Book> getBooksData(){
@@ -114,6 +123,37 @@ public class BookService {
     public List<Book>getPageOfAuthorsBooks(Integer author_id, Integer offset, Integer limit){
         Pageable nextPage=PageRequest.of(offset,limit);
         return repository.findBookByAuthor_Id(author_id,nextPage).getContent();
+    }
+
+    @Value("${google.books.api.key}")
+    private String  apiKey;
+
+    public List<Book> getPageOfGoogleBooksApiSearchResult(String searchWord, Integer limit, Integer offset){
+        String REQUEST_URL = "https://www.googleapis.com/books/v1/volumes" +
+                "?q=" + searchWord +
+                "&key=" + apiKey +
+                "&filter=paid-ebooks" +
+                "&startIndex=" + offset +
+                "&maxResult=" + limit;
+        Root root =restTemplate.getForEntity(REQUEST_URL,Root.class).getBody();
+        ArrayList<Book> list = new ArrayList<>();
+        if (root!=null){
+            for (Item item: root.getItems()){
+                Book book = new Book();
+                if (item.getVolumeInfo()!=null){
+                    book.setAuthor(new Author(item.getVolumeInfo().getAuthors()));
+                    book.setTitle(item.getVolumeInfo().getTitle());
+                    book.setImage(item.getVolumeInfo().getImageLinks().getThumbnail());
+                }
+                if (item.getSaleInfo()!=null){
+                    book.setPrice(item.getSaleInfo().getRetailPrice().getAmount());
+                    Double oldPrice = item.getSaleInfo().getListPrice().getAmount();
+                    book.setPriceOld(oldPrice);
+                }
+                list.add(book);
+            }
+        }
+        return list;
     }
 
 }
