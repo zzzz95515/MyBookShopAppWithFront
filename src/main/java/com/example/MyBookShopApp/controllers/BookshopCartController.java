@@ -7,9 +7,11 @@ import com.example.MyBookShopApp.security.BookstoreUserRegister;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.view.RedirectView;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
+import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 @Controller
@@ -27,10 +29,13 @@ public class BookshopCartController {
     private final BookstoreUserRegister userRegister;
 
     private final UsersCartRepository cartRepository;
-    public BookshopCartController(BookRepository bookRepository, BookstoreUserRegister userRegister, UsersCartRepository cartRepository) {
+
+    private final PaymentService paymentService;
+    public BookshopCartController(BookRepository bookRepository, BookstoreUserRegister userRegister, UsersCartRepository cartRepository, PaymentService paymentService) {
         this.bookRepository = bookRepository;
         this.userRegister = userRegister;
         this.cartRepository = cartRepository;
+        this.paymentService = paymentService;
     }
 
 
@@ -150,6 +155,30 @@ public class BookshopCartController {
 
 
 
+    @GetMapping("/books/pay")
+    public RedirectView handlePay(@CookieValue(name = "cartContents", required = false) String cartContents) throws NoSuchAlgorithmException {
+        BookstoreUser user = (BookstoreUser) userRegister.getCurrentUser();
+        List<Book> books;
+        if (user!=null){
+            UsersCartAndPostponed cart = cartRepository.findByUserEmail(user.getEmail());
+            if (cart==null){
+                cart=new UsersCartAndPostponed();
+                cart.setUserEmail(user.getEmail());
+            }
+            books = cart.getCartBookList();
+        }
+        else {
+            cartContents = cartContents.startsWith("/") ? cartContents.substring(1) : cartContents;
+            cartContents = cartContents.endsWith("/") ? cartContents.substring(0, cartContents.length()-1) : cartContents;
+            String[] cookiesSlugs = cartContents.split("/");
+            books = bookRepository.findBooksBySlugIn(cookiesSlugs);
+
+
+        }
+
+        String paymentUrl = paymentService.getPaymentUrl(books);
+        return new RedirectView(paymentUrl);
+    }
 
 
 
