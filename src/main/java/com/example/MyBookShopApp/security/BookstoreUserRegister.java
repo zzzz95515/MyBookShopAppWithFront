@@ -1,5 +1,8 @@
 package com.example.MyBookShopApp.security;
 
+import com.example.MyBookShopApp.data.TransactionRepo;
+import com.example.MyBookShopApp.data.UserPayStory;
+import com.example.MyBookShopApp.data.UserPayStoryRepo;
 import com.example.MyBookShopApp.logger.CurrentUser;
 import com.example.MyBookShopApp.logger.LogForSavingMethods;
 import com.example.MyBookShopApp.security.jwt.JWTUtil;
@@ -11,6 +14,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+
 @Service
 public class BookstoreUserRegister {
 
@@ -20,13 +25,19 @@ public class BookstoreUserRegister {
     private final PasswordEncoder passwordEncoder;
 
     private final BookstoreUserDetailsService userDetailsService;
+
+    private final UserPayStoryRepo storyRepo;
+
+    private final TransactionRepo transactionRepo;
     private final JWTUtil jwtUtil;
 
-    public BookstoreUserRegister(AuthenticationManager authenticationManager, BookstoreUserRepository bookstoreUserRepository, PasswordEncoder passwordEncoder, BookstoreUserDetailsService userDetailsService, JWTUtil jwtUtil) {
+    public BookstoreUserRegister(AuthenticationManager authenticationManager, BookstoreUserRepository bookstoreUserRepository, PasswordEncoder passwordEncoder, BookstoreUserDetailsService userDetailsService, UserPayStoryRepo storyRepo, TransactionRepo transactionRepo, JWTUtil jwtUtil) {
         this.authenticationManager = authenticationManager;
         this.bookstoreUserRepository = bookstoreUserRepository;
         this.passwordEncoder = passwordEncoder;
         this.userDetailsService = userDetailsService;
+        this.storyRepo = storyRepo;
+        this.transactionRepo = transactionRepo;
         this.jwtUtil = jwtUtil;
     }
 
@@ -38,8 +49,11 @@ public class BookstoreUserRegister {
             user.setEmail(registrationForm.getEmail());
             user.setPhone(registrationForm.getPhone());
             user.setPassword(passwordEncoder.encode(registrationForm.getPass()));
-
+            UserPayStory story = new UserPayStory();
+            story.setStoryUser(user);
+            story.setUsersTransactions(new ArrayList<>());
             bookstoreUserRepository.save(user);
+            storyRepo.save(story);
             return user;
         }
         return null;
@@ -56,6 +70,7 @@ public class BookstoreUserRegister {
         response.setResult(jwtToken);
         return response;
     }
+
 
 
 

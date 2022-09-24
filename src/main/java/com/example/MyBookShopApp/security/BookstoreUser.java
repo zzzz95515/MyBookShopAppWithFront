@@ -1,5 +1,7 @@
 package com.example.MyBookShopApp.security;
 
+import com.example.MyBookShopApp.data.UserPayStory;
+
 import javax.persistence.*;
 
 @Entity
@@ -14,6 +16,22 @@ public class BookstoreUser {
     private String email;
     private String phone;
     private String password;
+
+
+
+    private Double totalCash;
+
+
+
+
+
+    public Double getTotalCash() {
+        return totalCash;
+    }
+
+    public void setTotalCash(Double totalCash) {
+        this.totalCash = totalCash;
+    }
 
     public Integer getId() {
         return id;
