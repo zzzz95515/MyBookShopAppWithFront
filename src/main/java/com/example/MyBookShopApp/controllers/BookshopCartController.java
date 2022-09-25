@@ -4,6 +4,7 @@ package com.example.MyBookShopApp.controllers;
 import com.example.MyBookShopApp.data.*;
 import com.example.MyBookShopApp.security.BookstoreUser;
 import com.example.MyBookShopApp.security.BookstoreUserRegister;
+import liquibase.pro.packaged.D;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -31,11 +32,17 @@ public class BookshopCartController {
     private final UsersCartRepository cartRepository;
 
     private final PaymentService paymentService;
-    public BookshopCartController(BookRepository bookRepository, BookstoreUserRegister userRegister, UsersCartRepository cartRepository, PaymentService paymentService) {
+
+    private final UserPayStoryRepo payStoryRepo;
+
+    private final TransactionRepo transactionRepo;
+    public BookshopCartController(BookRepository bookRepository, BookstoreUserRegister userRegister, UsersCartRepository cartRepository, PaymentService paymentService, UserPayStoryRepo payStoryRepo, TransactionRepo transactionRepo) {
         this.bookRepository = bookRepository;
         this.userRegister = userRegister;
         this.cartRepository = cartRepository;
         this.paymentService = paymentService;
+        this.payStoryRepo = payStoryRepo;
+        this.transactionRepo = transactionRepo;
     }
 
 
@@ -166,6 +173,20 @@ public class BookshopCartController {
                 cart.setUserEmail(user.getEmail());
             }
             books = cart.getCartBookList();
+            Double price = books.stream().mapToDouble(Book::discountPrice).sum();
+            UserPayStory story = payStoryRepo.findUserPayStoryByStoryUser(user);
+            Transaction transaction = new Transaction();
+            transaction.setDate(new Date());
+            transaction.setOperationType("покупка книг");
+            transaction.setTotalSum(price);
+            List<Transaction> transactionList=story.getUsersTransactions();
+            transactionList.add(transaction);
+            story.setUsersTransactions(transactionList);
+            transactionRepo.save(transaction);
+            payStoryRepo.save(story);
+
+
+
         }
         else {
             cartContents = cartContents.startsWith("/") ? cartContents.substring(1) : cartContents;
@@ -175,7 +196,6 @@ public class BookshopCartController {
 
 
         }
-
         String paymentUrl = paymentService.getPaymentUrl(books);
         return new RedirectView(paymentUrl);
     }

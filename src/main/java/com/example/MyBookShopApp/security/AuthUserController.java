@@ -1,19 +1,22 @@
 package com.example.MyBookShopApp.security;
 
 
-import com.example.MyBookShopApp.data.SearchWordDto;
-import com.example.MyBookShopApp.data.Book;
+import com.example.MyBookShopApp.data.*;
 import com.example.MyBookShopApp.security.jwt.BlackListRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.view.RedirectView;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Controller
@@ -26,12 +29,23 @@ public class AuthUserController {
 
     private final JavaMailSender javaMailSender;
 
+    private final PasswordEncoder passwordEncoder;
+
+    private final UserPayStoryRepo storyRepo;
+
+    private final TransactionRepo transactionRepo;
+
+    private final PaymentService paymentService;
     @Autowired
-    public AuthUserController(BlackListRepository blackListRepository, BookstoreUserRegister userRegister, SmsService smsService, JavaMailSender javaMailSender) {
+    public AuthUserController(BlackListRepository blackListRepository, BookstoreUserRegister userRegister, SmsService smsService, JavaMailSender javaMailSender, PasswordEncoder passwordEncoder, UserPayStoryRepo storyRepo, TransactionRepo transactionRepo, PaymentService paymentService) {
         this.blackListRepository = blackListRepository;
         this.userRegister = userRegister;
         this.smsService = smsService;
         this.javaMailSender = javaMailSender;
+        this.passwordEncoder = passwordEncoder;
+        this.storyRepo = storyRepo;
+        this.transactionRepo = transactionRepo;
+        this.paymentService = paymentService;
     }
 
     @GetMapping("/signin")
@@ -121,6 +135,48 @@ public class AuthUserController {
         return "profile";
     }
 
+    @PostMapping("/profile")
+    public RedirectView rebuildProfile(Model model, @RequestParam(value = "name", required = false) String name,
+                                 @RequestParam(value = "password", required = false) String password,
+                                 @RequestParam(value = "password", required = false) String passwordReply,
+                                 @RequestParam(value = "email", required = false) String email,
+                                 @RequestParam(value = "phone", required = false) String phone,
+                                 @RequestParam(value = "sum", required = false) Double sum) throws NoSuchAlgorithmException {
+        BookstoreUser user = (BookstoreUser) userRegister.getCurrentUser();
+
+        if (sum!=null && sum>0){
+            Transaction transaction = new Transaction();
+            transaction.setDate(new Date());
+            transaction.setTotalSum(sum);
+            String paymentUrl = paymentService.getPaymentUrl(sum);
+            transaction.setOperationType("Пополнение на сумму");
+            UserPayStory story = storyRepo.findUserPayStoryByStoryUser(user);
+            List<Transaction> transactionList = story.getUsersTransactions();
+            transactionList.add(transaction);
+            transactionRepo.save(transaction);
+            story.setUsersTransactions(transactionList);
+            storyRepo.save(story);
+//            return new RedirectView(paymentUrl);
+            return new RedirectView("/profile");
+        }
+        else {
+            if (name!=null && !name.equals("")){
+                user.setName(name);
+            }
+            if (email!=null && !email.equals("")){
+                user.setEmail(email);
+            }
+            if (phone!=null && !phone.equals("")){
+                user.setPhone(phone);
+            }
+            if (password!=null && !password.equals("") && password.length()>5 && password.equals(passwordReply)){
+                user.setPassword(passwordEncoder.encode(password));
+            }
+            return new RedirectView("/profile");
+        }
+
+
+    }
 
 
 
@@ -134,5 +190,10 @@ public class AuthUserController {
         return new ArrayList<>();
     }
 
-
+    @ModelAttribute("story")
+    public List<Transaction> transactions(){
+        BookstoreUser user = (BookstoreUser) userRegister.getCurrentUser();
+        UserPayStory story = storyRepo.findUserPayStoryByStoryUser(user);
+        return story.getUsersTransactions();
+    }
 }

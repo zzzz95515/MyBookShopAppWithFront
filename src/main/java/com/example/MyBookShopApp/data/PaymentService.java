@@ -35,4 +35,17 @@ public class PaymentService {
                 "&SignatureValue=" + DatatypeConverter.printHexBinary(md.digest()).toUpperCase() +
                 "&IsTest=1";
     }
+    public String getPaymentUrl(Double sum) throws NoSuchAlgorithmException {
+        MessageDigest md = MessageDigest.getInstance("MD5");
+        String invId="5";
+        md.update((merchantLogin+":"+sum.toString()+":"+invId+":"+firstTestPass).getBytes());
+        return "https://auth.robokassa.ru/Merchant/Index.aspx"+
+                "?MerchantLogin=" + merchantLogin+
+                "&invId="+invId+
+                "&Culture=ru"+
+                "&encoding=utf-8" +
+                "&OutSum="+sum.toString()+
+                "&SignatureValue=" + DatatypeConverter.printHexBinary(md.digest()).toUpperCase() +
+                "&IsTest=1";
+    }
 }
