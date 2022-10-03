@@ -107,7 +107,7 @@ public class BookService {
 
     public List<Book> getPageOfPopularBooksOrderBy(Integer offset, Integer limit){
         Pageable nextPage=PageRequest.of(offset,limit);
-        return repository.findBookByIsBestsellerGreaterThanOrderByIsBestseller(0,nextPage).getContent();
+        return repository.findBookByIsBestsellerGreaterThanOrderByIsBestsellerDesc(0,nextPage).getContent();
     }
 
     public List<Book> getPageOfBooksByTag(String tag, Integer offset, Integer limit){

@@ -1,8 +1,8 @@
 package com.example.MyBookShopApp.controllers;
 
 import com.example.MyBookShopApp.data.*;
+import com.example.MyBookShopApp.security.BookstoreUser;
 import com.example.MyBookShopApp.security.BookstoreUserRegister;
-import com.example.MyBookShopApp.security.jwt.JWTUtil;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -39,17 +39,63 @@ public class BooksController {
 
     private final BookReviewsRepository bookReviewsRepository;
 
-    public BooksController(BookstoreUserRegister userRegister, BookRepository bookRepository, ResourceStorage storage, BookRateRepository bookRateRepository, BookReviewsRepository bookReviewsRepository) {
+    private final ViewedBookRepo viewedBookRepo;
+    private final ViewedBooksRepo viewedBooksRepo;
+
+    public BooksController(BookstoreUserRegister userRegister, BookRepository bookRepository, ResourceStorage storage, BookRateRepository bookRateRepository, BookReviewsRepository bookReviewsRepository, ViewedBookRepo viewedBookRepo, ViewedBooksRepo viewedBooksRepo) {
         this.userRegister = userRegister;
         this.bookRepository = bookRepository;
         this.storage = storage;
         this.bookRateRepository = bookRateRepository;
         this.bookReviewsRepository = bookReviewsRepository;
+        this.viewedBookRepo = viewedBookRepo;
+        this.viewedBooksRepo = viewedBooksRepo;
     }
 
     @GetMapping("/{slug}")
     public String bookPage(@PathVariable("slug") String slug, Model model){
         Book bookBySlug= bookRepository.findBookBySlug(slug);
+        bookBySlug.setIsBestseller(bookBySlug.getIsBestseller()+1);
+        BookstoreUser user= (BookstoreUser) userRegister.getCurrentUser();
+        bookRepository.save(bookBySlug);
+        Date date = new Date();
+        if (user!=null){
+            LastViewedBooks lastViewedBooks =viewedBooksRepo.findByBookstoreUser(user);
+            boolean flag=true;
+            List<ViewedBook> list;
+            if (lastViewedBooks!=null){
+                list = lastViewedBooks.getViewedBooks();
+                for (ViewedBook viewedBook: list){
+                    if (viewedBook.getBook().getSlug().equals(slug)){
+                        viewedBook.setDate(new Date(System.currentTimeMillis()+1000*60*60));
+                        flag=false;
+                    }
+                    if (viewedBook.getDate().before(date)){
+                        list.remove(viewedBook);
+                    }
+                }
+                if (flag){
+                    ViewedBook vb=new ViewedBook();
+                    vb.setBook(bookBySlug);
+                    vb.setDate(new Date(System.currentTimeMillis()+1000*60*60));
+                    viewedBookRepo.save(vb);
+                    list.add(vb);
+                }
+            }
+            else {
+                lastViewedBooks=new LastViewedBooks();
+                lastViewedBooks.setBookstoreUser(user);
+                list=new ArrayList<>();
+                ViewedBook vb=new ViewedBook();
+                vb.setBook(bookBySlug);
+                vb.setDate(new Date(System.currentTimeMillis()+1000*60*60));
+                viewedBookRepo.save(vb);
+                list.add(vb);
+            }
+
+            lastViewedBooks.setViewedBooks(list);
+            viewedBooksRepo.save(lastViewedBooks);
+        }
         model.addAttribute("bookBySlug",bookBySlug);
         List<BookRateEntity> ratesList=bookRateRepository.findAllByBook_Slug(slug);
         model.addAttribute("reviews",bookReviewsRepository.findAllByBook_Slug(slug));

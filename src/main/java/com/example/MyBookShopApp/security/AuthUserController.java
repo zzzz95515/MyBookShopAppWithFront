@@ -50,6 +50,7 @@ public class AuthUserController {
 
     @GetMapping("/signin")
     public String handleSignIn(){
+
         return "/signin";
     }
 
@@ -194,6 +195,9 @@ public class AuthUserController {
     public List<Transaction> transactions(){
         BookstoreUser user = (BookstoreUser) userRegister.getCurrentUser();
         UserPayStory story = storyRepo.findUserPayStoryByStoryUser(user);
+        if (story==null){
+            story=new UserPayStory();
+        }
         return story.getUsersTransactions();
     }
 }
