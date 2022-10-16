@@ -11,7 +11,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -154,6 +153,11 @@ public class BookService {
             }
         }
         return list;
+    }
+
+    public Page<Book> getLastViewedBooks(Integer offset,Integer limit){
+        Pageable nextPage = PageRequest.of(offset,limit);
+        return repository.findAll(nextPage);
     }
 
 }

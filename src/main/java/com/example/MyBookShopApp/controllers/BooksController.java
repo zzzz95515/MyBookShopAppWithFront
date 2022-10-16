@@ -20,6 +20,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.StringJoiner;
 import java.util.logging.Logger;
 
 @Controller
@@ -53,8 +54,9 @@ public class BooksController {
     }
 
     @GetMapping("/{slug}")
-    public String bookPage(@PathVariable("slug") String slug, Model model){
+    public String bookPage(@PathVariable("slug") String slug, @CookieValue(name = "LastBooks", required = false) String cartContents, HttpServletResponse response, Model model){
         Book bookBySlug= bookRepository.findBookBySlug(slug);
+        addToViewedBooksCookies(slug,cartContents,response,model);
         bookBySlug.setIsBestseller(bookBySlug.getIsBestseller()+1);
         BookstoreUser user= (BookstoreUser) userRegister.getCurrentUser();
         bookRepository.save(bookBySlug);
@@ -142,6 +144,23 @@ public class BooksController {
     }
 
 
+
+
+    public void addToViewedBooksCookies(String slug, String cartContents, HttpServletResponse response, Model model){
+        if (cartContents == null || cartContents.equals("")) {
+            Cookie cookie = new Cookie("LastBooks", slug);
+            cookie.setPath("/");
+            response.addCookie(cookie);
+            model.addAttribute("isLastBooks", false);
+        } else if (!cartContents.contains(slug)) {
+            StringJoiner stringJoiner = new StringJoiner("/");
+            stringJoiner.add(cartContents).add(slug);
+            Cookie cookie = new Cookie("LastBooks", stringJoiner.toString());
+            cookie.setPath("/");
+            response.addCookie(cookie);
+            model.addAttribute("isLastBooks", false);
+        }
+    }
 
 
     @ModelAttribute("searchWordDto")

@@ -14,8 +14,10 @@ import java.util.List;
 @Controller
 public class MainPageController {
 
+    private final BookRepository bookRepository;
     @Autowired
-    public MainPageController(BookService bookService, TagService tagService) {
+    public MainPageController(BookRepository bookRepository, BookService bookService, TagService tagService) {
+        this.bookRepository = bookRepository;
         this.bookService = bookService;
         this.tagService = tagService;
     }
@@ -34,11 +36,13 @@ public class MainPageController {
         return bookService.getPageOfPopularBooks(0,6);
     }
 
+
     private final BookService bookService;
 
     private final TagService tagService;
     @GetMapping("/")
-    public String mainPage(){
+    public String mainPage(@CookieValue(name = "LastBooks", required = false) String cartContents, Model model){
+        getLastViewed(cartContents,model);
         return "index";
     }
 
@@ -83,7 +87,7 @@ public class MainPageController {
     @ResponseBody
     public BooksPageDto getPopularBooksPage(@RequestParam("offset") Integer offset, @RequestParam("limit") Integer limit){
 
-        return new BooksPageDto( bookService.getPageOfPopularBooks(offset, limit));
+        return new BooksPageDto( bookService.getPageOfPopularBooksOrderBy(offset, limit));
     }
 
     @GetMapping("/books/recent1")
@@ -96,6 +100,40 @@ public class MainPageController {
     @ModelAttribute("tags")
     public List<Tag> getTags(){
         return tagService.getTags();
+    }
+
+
+    public void getLastViewed(@CookieValue(name = "LastBooks", required = false) String cartContents, Model model){
+        if (cartContents==null || cartContents.equals("")){
+            model.addAttribute("isCartEmpty",true);
+        } else {
+            model.addAttribute("isCartEmpty",false);
+            cartContents = cartContents.startsWith("/") ? cartContents.substring(1) : cartContents;
+            cartContents = cartContents.endsWith("/") ? cartContents.substring(0, cartContents.length()-1) : cartContents;
+            String[] cookiesSlugs = cartContents.split("/");
+            List<Book> booksFromCookiesSlugs = bookRepository.findBooksBySlugIn(cookiesSlugs);
+            model.addAttribute("LastBooks", booksFromCookiesSlugs);
+        }
+    }
+
+    @ModelAttribute("lastViewed")
+    List<Book> lastBooks(){
+        return new ArrayList<>();
+    }
+    @GetMapping("/viewed")
+    public String recentBooksSearch(@CookieValue(name = "LastBooks", required = false) String cartContents, Model model){
+
+        if (cartContents==null || cartContents.equals("")){
+            model.addAttribute("isLastBooks",true);
+        } else {
+            model.addAttribute("isLastBooks",false);
+            cartContents = cartContents.startsWith("/") ? cartContents.substring(1) : cartContents;
+            cartContents = cartContents.endsWith("/") ? cartContents.substring(0, cartContents.length()-1) : cartContents;
+            String[] cookiesSlugs = cartContents.split("/");
+            List<Book> booksFromCookiesSlugs = bookRepository.findBooksBySlugIn(cookiesSlugs);
+            model.addAttribute("lastViewed", booksFromCookiesSlugs);
+        }
+        return "/books/last";
     }
 
 }
